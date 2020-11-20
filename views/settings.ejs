@@ -1,0 +1,99 @@
+<html>
+	<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	
+	<style>
+		.pswd{
+			width:350px;
+			height:35px;
+			border-radius:25px;
+			margin:10px 5px 5px 10px;
+			padding:0 0 0 10px;
+			outline:none;
+			background:transparent;
+			border:1px solid pink;
+		}
+		
+		.modal-body input[type='submit']{
+			height:35px;
+			width:110px;
+			background:transparent;
+			margin:10px 0 0 10px;
+			border:1px solid red;
+			border-radius:25px;	
+		}
+	</style>
+	
+	</head>
+	<body>
+		<div>
+			<button id="deleteuser">Delete Account</button>
+		</div>
+		
+		<div id="password_change_panel" style="display:none">
+		<h2>Change your password</h2>
+		<form action="" method="POST">
+			<input type="password" name="old_password" placeholder="Enter your current password"><br>
+			<input type="password" name="password" placeholder="Enter your new password"><br>
+			<input type="password" name="confirm_password" placeholder="Confirm new password"><br>
+			<input type="submit" value="Submit">
+		</form>
+		</div>
+		
+		<div id="delete_account_panel" style="display:none">
+			<h1>Delete Account Permanently</h1>
+			<h2>Are you sure?</h2>
+			<button id="yes">Yes</button>
+			<button id="no">No</button>
+		</div>
+		
+		
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+			Change Password
+		</button>
+
+		<!-- Modal -->
+		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Change your password3</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				  <span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+			  <div class="modal-body">
+				<form action="" method="POST">
+					<input class="pswd" type="password" name="old_password" placeholder="Enter your current password"><br>
+					<input class="pswd" type="password" name="password" placeholder="Enter your new password"><br>
+					<input class="pswd" type="password" name="confirm_password" placeholder="Confirm new password"><br>
+					<input type="submit" value="Change">
+				</form>
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<!--button type="button" class="btn btn-primary">Save changes</button -->
+			  </div>
+			</div>
+		  </div>
+		</div>
+			
+
+		
+		<script>
+			$(document).ready(function(){
+				$('#changepasswd').click(function(){
+					$('#password_change_panel').slideToggle();
+				});
+					
+				$('#deleteuser').click(function(){
+					$('#delete_account_panel').slideToggle();
+				});
+			});
+		</script>
+	</body>
+</html>

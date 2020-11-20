@@ -1,0 +1,443 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+ 		<link rel='stylesheet' id='compiled.css-css'  href='/styles/manikbootstrap.css' type='text/css' media='all' />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" -->
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+		<!-- script libraries for sortable divsions -->
+		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+		<!-- for material fonts -->
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+		<style>
+			.material{
+				width:40px;
+				height:40px;
+				font-size:20px;
+				float:right;
+				background:rgba(0,0,0,0.03);
+				border:1px solid black;
+				border-radius:50%;
+				outline:none;
+			}
+		</style>
+
+	</head>
+
+	<body>
+
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#"><%= userdetails.username %></a>
+			</div>
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="/home">Home</a></li>
+				<li  data-toggle="modal" data-target="#exampleModal"><a>Options</a></li>
+				<li><a href="/logout">Logout</a></li>
+			</ul>
+		</div>
+	</nav>
+
+
+		<div><h1>Welcome : <%= userdetails.username %></h1></div>
+
+
+		<!-- <%- include partials/nav.ejs %> -->
+
+		<div>
+		<form action="/home" method="post">
+			<div class="col-lg-6">
+				<div class="input-group">
+					<input type="text" class="form-control" name="task"  id="task" placeholder="Enter task here..." required>
+					<input type="hidden" id="user_email" name="user_email" value="<%=userdetails.useremail%>"/>
+					<span class="input-group-btn">
+						<input class="btn btn-primary" id="formSubmit" type="submit" value="Save"/>
+					</span>
+				</div>
+				<!-- /input-group -->
+			</div><!-- /.col-lg-6 -->
+		</form>
+		</div>
+
+
+		<br/>
+
+
+		<div class="list-group" id="sortable">
+			<% for(var i in tasks){  %>
+			<h2>
+				<div class="task_class" id="<%=tasks[i].id%>"><%= tasks[i].task %>
+					<button class="btn btn-danger delete_buttons" pid="<%=tasks[i].id%>">Delete</button>
+					<span class="input-group-btn">
+						<input class="btn btn-primary" id="<%=tasks[i].id%>" name="editTask" onclick="editTask('<%=tasks[i].id%>')" type="submit" value="Edit"/>
+						<input class="form-control" id="<%=tasks[i].id%>" name="editTask_text_box" onclick="" type="text" value=""/>
+					</span>
+
+
+
+				</div>
+			</h2>
+			<% }%>
+		</div>
+
+
+		<script>
+
+		function editTask(kl){
+			alert('edit task clicked '+kl);
+
+			$(document).ready(function(){
+
+				//var tId = evt.target.getAttribute('id');
+				alert("in the document.ready()" );
+				$.ajax({
+					type:'POST',
+					url:'/edit',
+					data: {id : 'manikanta'},
+					success:function(result){
+						console.log("Success..."+result);
+						//$(".list-group").html(result);
+					},
+				});
+
+
+			});
+		}
+
+
+			$(document).ready(function(){
+
+				$('#sortable').click(function(evt){
+
+					var _check = evt.target.hasAttribute("pid");
+					//alert(evt.target.getAttribute("pid"));
+					//alert(_check);
+					if(_check){
+						var _delete = confirm("Are you sure to delete this item?");
+
+						if(_delete){
+							$.ajax({
+								type:'GET',
+								url:'/del',
+								data:{id:evt.target.getAttribute("pid")},
+								success:function(result){
+									console.log("Success..."+result);
+									$(".list-group").html(result);
+								},
+							});
+						}
+					}
+
+				});
+
+
+				$('#formSubmit').click(function(evt){
+					evt.preventDefault();
+					var task = $('#task').val();
+					var email = $('#user_email').val();
+					$('#task').val("");
+
+					$.ajax({
+						type:'POST',
+						url: '/home',
+						data:{task:task+'*',user_email:email},
+						success: function(todo){
+							var parent = document.getElementById('sortable');
+							var paiChild = document.createElement('h2');
+							var child = document.createElement('li');
+							child.setAttribute("class", "task_class");
+							//child.setAttribute("id",todo._id);
+							child.textContent = todo.task;
+							var button =  document.createElement('button');
+							button.setAttribute("class","btn btn-danger delete_buttons");
+							button.setAttribute("onclick","muFun()");
+							button.setAttribute("pid",todo._id);
+							button.textContent = "Delete";
+							paiChild.appendChild(child);
+							child.appendChild(button);
+							parent.appendChild(paiChild);
+						}
+					});
+				});
+
+			});
+		</script>
+
+
+
+
+
+
+
+
+
+
+		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Change your password3</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				  <span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+			  <div class="modal-body">
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal23">
+					Change Password
+				</button>
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal25">
+					Update email
+				</button>
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal24">
+					Delete Account
+				</button>
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" id="close_optionstab">Close</button>
+				<!--button type="button" class="btn btn-primary">Save changes</button -->
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+
+
+
+
+		<div class="modal fade" id="exampleModal23" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+			<div class="modal-content">
+
+			  <div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Change your password</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				  <span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+
+			  <div class="modal-body">
+				<form action="" method="GET" id="changePasswordForm">
+					<div class="form-group">
+						<div class="input-group">
+						<div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
+						<input class="form-control input-lg" type="password" id="password" placeholder="Enter your new password" data-parsley-length="[6, 10]" required>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
+							<input class="form-control input-lg" type="password" id="confirm_password" placeholder="Confirm new password" data-parsley-length="[6, 10]" required>
+						</div>
+					</div>
+
+					<button type="submit" class="btn btn-primary">Change Password</button>
+				</form>
+			  </div>
+
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" id="close_password_changer">Close</button>
+				<!--button type="button" class="btn btn-primary">Save changes</button -->
+			  </div>
+
+			</div>
+		  </div>
+		</div>
+
+
+		<div class="modal fade" id="exampleModal24" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Delete account.</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				  <span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+			  <div class="modal-body">
+				<h2>Are you sure to delete account?</h2>
+				<button type="button" class="btn btn-primary" data-dismiss="modal" id="confirm_delete" name="confirm_delete">Yes</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<!--button type="button" class="btn btn-primary">Save changes</button -->
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+
+		<div class="modal fade" id="exampleModal25" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Change your password3</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				  <span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+			  <div class="modal-body">
+				<form action="" method="GET" id="updateEmailForm">
+					<div class="form-group">
+						<div class="input-group">
+						<div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
+						<input class="form-control input-lg" type="email" id="new_email" placeholder="Enter your new email" data-parsley-length="[6, 10]" required>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="input-group">
+						<div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
+						<input class="form-control input-lg" type="email" id="confirm_new_email" placeholder="Confirm new email" data-parsley-length="[6, 10]" required>
+						</div>
+					</div>
+					<button type="submit" class="btn btn-success btn-block btn-lg">Update Email</button>
+				</form>
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" id="close_email_updater">Close</button>
+			  </div>
+
+			</div>
+		  </div>
+		</div>
+
+
+
+
+		<!-- GREAT YOUR PASSWORD HAS CHANGED SUCCESSFULLY -->
+		<div class="text-center">
+			<button id="afterpasswordchange" href="#myModal" class="trigger-btn" data-toggle="modal" hidden></button>
+		</div>
+
+		<div id="myModal" class="modal fade">
+			<div class="modal-dialog modal-confirm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div class="icon-box">
+							<i class="material-icons">&#xE876;</i>
+						</div>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body text-center">
+						<h4>Great!</h4>
+						<p>Your password has been changed successfully.</p>
+						<button class="btn btn-success" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+
+
+		<script>
+
+			$('#confirm_delete').click(function(){
+				alert("You are about to delete your account...");
+				alert("<%=userdetails.useremail%>");
+				$.ajax({
+					type:'GET',
+					url:'/deleteuser',
+					data:{email:"<%=userdetails.useremail%>"},
+					success:function(result){
+						console.log('User deleted successfully'+result);
+					}
+				});
+
+			});
+
+
+			$('#changePasswordForm').submit(function(evt){
+				evt.preventDefault();
+				var old_password = $('#old_password').val();
+				var password = $('#password').val();
+				var confirm_password = $('#confirm_password').val();
+
+				if(password!=confirm_password){
+					alert('passwords donot match');
+					window.location='/home';
+				}
+				else{
+					$.ajax({
+						type:'GET',
+						url:'/changepassword',
+						data:{email:"<%= userdetails.useremail %>", password:password},
+						success:function(result){
+							console.log('RETURN from changepassword');
+						}
+					});
+
+					$('#close_password_changer').click();
+					$('#close_optionstab').click();
+					$('#afterpasswordchange').click().delay(3000,function(){
+						$('body').click();
+					});
+
+				}
+
+				$('#task').val("");
+			});
+
+			$('#updateEmailForm').submit(function(evt){
+				alert("email will update");
+				evt.preventDefault();
+				var new_email = $('#new_email').val();
+				var confirm_new_email = $('#confirm_new_email').val();
+				if(new_email!=confirm_new_email){
+					alert("Emails donot match...\n Returning to home");
+					window.location="\home";
+				}
+
+				else{
+					$.ajax({
+						type:'GET',
+						url:'/updateemail',
+						data: {email:"<%= userdetails.useremail %>", new_email:new_email}
+					});
+					alert("ajax call done...");
+				}
+			});
+
+
+		</script>
+
+
+		<div>
+
+		<div>
+			<div class="form-check">
+				<input type="checkbox" class="form-check-input" id="materialUnchecked">
+				<label class="form-check-label" for="materialUnchecked">Material unchecked</label>
+			</div>
+
+			<!-- Material checked -->
+			<div class="form-check">
+				<input type="checkbox" class="form-check-input" id="materialChecked" checked>
+				<label class="form-check-label" for="materialChecked">Material checked</label>
+			</div>
+			<div class="my-2"></div>
+		</div>
+
+		</div>
+
+
+    </div>
+    </div>
+
+
+	</body>
+
+</html>

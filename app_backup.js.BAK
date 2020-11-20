@@ -1,0 +1,69 @@
+var express =  require('express');
+var bodyParser = require('body-parser');
+var session = require('express-session');
+var dbsave =  require('./dbsave');
+var findUser =  require('./findUser').findUser;
+var getUserDocs = require('./findUser').getUserDocs;
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
+var saveUser = dbsave.saveUser;
+var saveTask = dbsave.saveTask;
+var deleteTask = require('./findUser').deleteTask;
+var app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: '1234@manik'  
+}));  
+
+
+
+app.set('view engine','ejs');
+app.use(express.static('./assets'));
+
+app.get('/login',function(req,res){
+	res.render('login');
+});
+
+app.get('/',function(req,res){
+	res.render('index');
+});
+
+app.get('/signup',function(req,res){
+	res.render('signup');
+});
+
+app.post('/login', urlencodedParser, function(req, res) {
+	//console.log(req.body);
+	//res.redirect('/home');
+	findUser(req.body.email, req.body.password, req, res);
+});
+
+
+app.post('/signup', urlencodedParser, function(req, res) {
+	//console.log('Signup post called...');
+	saveUser(req.body);
+	//console.log(req.body);
+	res.send('<h1>Signup Succesfull...</h1>');
+});
+
+app.get('/home',function(req,res){
+	//console.log(req.session.username+" &&&&&&& "+ req.session.useremail);
+	getUserDocs(req, res);
+});
+
+app.post('/home', urlencodedParser, function(req, res) {
+	console.log('POST request from HOME PAGE...');
+	//console.log(req.body);
+	saveTask(req.body,res);
+	res.redirect('/home');
+	//res.send('<h1>POST req from /home</h1>');
+});
+
+app.get('/delete/:id',function(req,res){
+	console.log('DELETE REQUEST FROM BROWSER...',req.params.id);
+	deleteTask(req.params.id,res);	
+});
+
+
+app.listen('3000');
